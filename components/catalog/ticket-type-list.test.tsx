@@ -1,6 +1,8 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 import type { RulesTicketType, VisibleTicketType } from "@/lib/catalog/rules";
+import { expectNoA11yViolations } from "@/test/a11y";
+import { mixedTicketTypes } from "@/test/fixtures/catalog";
 import { TicketTypeList } from "./ticket-type-list";
 
 type Row = RulesTicketType & { id: number };
@@ -90,5 +92,17 @@ describe("TicketTypeList", () => {
       "Regular",
       "VIP",
     ]);
+  });
+
+  describe("accessibility", () => {
+    test("every ticket state has no violations", async () => {
+      const { container } = render(
+        <TicketTypeList
+          ticketTypes={mixedTicketTypes()}
+          timeZone="Europe/Amsterdam"
+        />,
+      );
+      await expectNoA11yViolations(container);
+    });
   });
 });

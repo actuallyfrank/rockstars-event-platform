@@ -55,3 +55,4 @@ Before finishing a task, run `pnpm lint`, `pnpm format:check`, `pnpm typecheck` 
 
 - **Vitest** (`pnpm test`): `*.test.ts` files run in Node (rules, formatters, and integration tests against a fresh temp-file database). `*.test.tsx` files run in jsdom with React Testing Library.
 - **Playwright** (`pnpm test:e2e`): runs Chromium against a production build on port 3100. Global setup resets and seeds `data/e2e.db` before each run. It needs the one-time `pnpm exec playwright install chromium`. Traces are kept on failure: `pnpm exec playwright show-trace test-results/<test>/trace.zip`.
+- **Accessibility** is required for every component and page (WCAG 2.2 A/AA via axe-core). Components use `expectNoA11yViolations(container)` from `test/a11y.ts`. Pages are listed in `e2e/accessibility.spec.ts` and checked in light and dark mode. The full testing rules are in `.claude/rules/testing.md`.
