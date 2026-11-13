@@ -28,4 +28,4 @@ Out of scope: buying tickets, accounts, organiser event management, search and f
 - Greenfield project: no existing code or specs are affected.
 - Introduces the core data model (Event, TicketType) that the later purchase and organiser changes will extend.
 - Remaining stock counts become publicly visible data.
-- The tech stack is not yet chosen. It will be set up before implementation starts, so the design and tasks are written stack-agnostic.
+- The tech stack is documented in `docs/tech-stack.md` (Next.js 16, SQLite via libSQL, Drizzle, Vitest + React Testing Library, Playwright). Setting up the project scaffold is part of this change.
