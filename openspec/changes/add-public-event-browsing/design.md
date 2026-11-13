@@ -96,8 +96,9 @@ eventSummary(visible):
 
 - **Routes**: `/events` is the event list. `/` redirects to `/events`. `/events/[slug]` is the detail page.
 - Both pages are **async Server Components** that call data functions (`listEvents(db, now)`, `getListedEventBySlug(db, slug, now)`) on the server. No public API is added.
-- The detail page calls `notFound()` when the lookup returns nothing. That covers both unknown and hidden slugs, so both get the same 404.
-- **Cache window**: set explicitly to 60 seconds for both pages, rather than relying on framework defaults. Use route segment `revalidate = 60`, or the equivalent `cacheLife` if Cache Components is turned on. `now` is read once per render and passed into the data functions.
+- The detail page calls `notFound()` when the lookup returns nothing. That covers both unknown and hidden slugs, so both get the same not-found page.
+- **Soft 404 (decided during implementation)**: in Next.js 16.4 the response starts streaming the page shell before a request-time `notFound()` runs, so the not-found page is served with HTTP status 200, not 404. Next.js adds `<meta name="robots" content="noindex">`. This holds with and without Cache Components; only Proxy could return a real 404, which was rejected as extra complexity. Tests assert the not-found page and the `noindex` tag, not the status code.
+- **Cache window**: set explicitly to 60 seconds for both pages, rather than relying on framework defaults. Use route segment `revalidate = 60`, or the equivalent `cacheLife` if Cache Components is turned on. `now` is read once per render and passed into the data functions. As implemented (Cache Components is on): `cacheLife({ stale: 30, revalidate: 30, expire: 60 })` inside a `"use cache"` scope that reads `now` and calls the data function, so content is at most 60 seconds old. The list page reaches that scope through `await connection()` and the detail page through `await params`, so the database is never read at build time.
 - **Formatting**: prices use `Intl.NumberFormat` with `style: "currency"` from minor units. Dates and times use `Intl.DateTimeFormat` with `timeZone` set to the event's timezone. Both live in a small formatter module with no framework imports.
 - Styling uses Tailwind. Sale states are shown as visible text ("Sold out", "On sale from …", "N left"), not by color alone.
 
@@ -122,7 +123,7 @@ Per ADR 0004, each layer is tested where it is cheapest to test reliably:
 | Rules module, formatters | Vitest unit | Plain objects, fixed `now`, fixed instants |
 | `listEvents`, `getListedEventBySlug`, seed idempotency | Vitest integration | Fresh libSQL DB (temp file or `:memory:`), migrated + seeded |
 | Ticket row states, empty list state | Vitest + React Testing Library | Fixture props |
-| Pages, ordering, summaries, HTTP 404, no-auth access | Playwright (Chromium) | Production build on seeded `data/e2e.db` |
+| Pages, ordering, summaries, not-found page (soft 404), no-auth access | Playwright (Chromium) | Production build on seeded `data/e2e.db` |
 
 The final integration check maps every scenario in `specs/event-catalog/spec.md` to at least one passing test.
 

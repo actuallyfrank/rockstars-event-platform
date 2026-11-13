@@ -1,0 +1,10 @@
+.next
+node_modules
+pnpm-lock.yaml
+drizzle/meta
+data
+playwright-report
+test-results
+openspec
+.claude
+docs

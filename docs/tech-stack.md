@@ -28,7 +28,7 @@ How the choices meet the constraints in `openspec/changes/add-public-event-brows
 
 - **Visibility and sale-state rules** are a pure TypeScript module (`ticketTypeState`, `isListed`, `eventSummary`) with no framework or database imports. `now` is passed in. Tested with Vitest unit tests only.
 - **Public pages** are async Server Components that read the database on the server. No public API is needed for this change. The cache window stays at 60 seconds or less (design.md, Risks).
-- **Not-found** for unknown or hidden events uses Next.js `notFound()` from the detail page after the `isListed` check.
+- **Not-found** for unknown or hidden events uses Next.js `notFound()` from the detail page after the `isListed` check. This is a soft 404: Next.js 16 serves it with status 200 plus a `noindex` robots tag.
 - **Instants** are stored in UTC as integer epoch milliseconds (Drizzle `integer({ mode: "timestamp_ms" })`), because SQLite has no native timestamp type. Each event keeps its IANA `timezone`.
 - **Display formatting** uses the built-in `Intl.DateTimeFormat` (with `timeZone` set to the event's timezone) and `Intl.NumberFormat` (with `style: "currency"`). No date or money library.
 - **Prices** are stored as integer minor units plus an ISO 4217 currency code.
